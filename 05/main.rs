@@ -36,7 +36,7 @@ fn nice1(word: &str) -> bool {
     let mut vowels = 0;
     let mut double = false;
 
-    let mut prev : char = 0 as char;
+    let mut prev: char = 0 as char;
     for (i, c) in word.chars().enumerate() {
         vowels += match c {
             'a' | 'e' | 'i' | 'o' | 'u' => 1,
@@ -57,13 +57,13 @@ fn nice2(word: &str) -> bool {
     let mut double = false;
     let mut same_char = false;
 
-    let mut prev1 : char = 0 as char;
-    let mut prev2 : char = 0 as char;
+    let mut prev1: char = 0 as char;
+    let mut prev2: char = 0 as char;
     for (i, c) in word.chars().enumerate() {
         if i >= 2 {
             if !double {
                 // Note: This doesn't work for multi-byte chars
-                double = (&word[i..length]).contains(&word[i-2..i]);
+                double = (&word[i..length]).contains(&word[i - 2..i]);
             }
             if !same_char {
                 same_char = c == prev2;

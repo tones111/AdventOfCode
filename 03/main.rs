@@ -9,13 +9,13 @@ struct Coord {
 
 fn main() {
     // puzzle 1
-    let mut pos = Coord{x: 0, y: 0};
+    let mut pos = Coord { x: 0, y: 0 };
     let mut visited = HashSet::new();
     visited.insert(pos);
 
     // puzzle 2
-    let mut pos1 = Coord{x: 0, y: 0};
-    let mut pos2 = Coord{x: 0, y: 0};
+    let mut pos1 = Coord { x: 0, y: 0 };
+    let mut pos2 = Coord { x: 0, y: 0 };
     let mut visited2 = HashSet::new();
     visited2.insert(pos1);
 
@@ -41,11 +41,19 @@ fn main() {
 fn move_pos(c: Coord, dir: char) -> Coord {
     let mut pos = c;
     match dir {
-        '^' => {pos.y += 1;}
-        '>' => {pos.x += 1;}
-        'v' => {pos.y -= 1;}
-        '<' => {pos.x -= 1;}
-        _   => {}
+        '^' => {
+            pos.y += 1;
+        }
+        '>' => {
+            pos.x += 1;
+        }
+        'v' => {
+            pos.y -= 1;
+        }
+        '<' => {
+            pos.x -= 1;
+        }
+        _ => {}
     }
     pos
 }

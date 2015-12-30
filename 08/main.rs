@@ -41,8 +41,13 @@ fn main() {
                         recode.push(c);
                         escape = false;
                     }
-                    'x'        => { escape_lit = 2; recode.push(c); }
-                    _          => { println!("invalid escape ({})", c); }
+                    'x' => {
+                        escape_lit = 2;
+                        recode.push(c);
+                    }
+                    _ => {
+                        println!("invalid escape ({})", c);
+                    }
                 }
             } else if c == '\\' {
                 recode.push_str(r"\\");

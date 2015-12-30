@@ -14,9 +14,9 @@ impl FromStr for Command {
         use Command::*;
         match s {
             "toggle" => Ok(Toggle),
-            "on"     => Ok(On),
-            "off"    => Ok(Off),
-            _        => Err(()),
+            "on" => Ok(On),
+            "off" => Ok(Off),
+            _ => Err(()),
         }
     }
 }
@@ -47,12 +47,12 @@ impl FromStr for Action {
                 action_index = 0;
                 start_index = 1;
                 end_index = 3;
-            },
+            }
             "turn" => {
                 action_index = 1;
                 start_index = 2;
                 end_index = 4;
-            },
+            }
             _ => {
                 return Err(());
             }
@@ -61,13 +61,17 @@ impl FromStr for Action {
             cmd: s[action_index].parse().unwrap(),
             start: {
                 let mut p = s[start_index].split(',');
-                Point{x: p.next().unwrap().parse().unwrap(),
-                      y: p.next().unwrap().parse().unwrap()}
+                Point {
+                    x: p.next().unwrap().parse().unwrap(),
+                    y: p.next().unwrap().parse().unwrap(),
+                }
             },
-            end : {
+            end: {
                 let mut p = s[end_index].split(',');
-                Point{x: p.next().unwrap().parse().unwrap(),
-                      y: p.next().unwrap().parse().unwrap()}
+                Point {
+                    x: p.next().unwrap().parse().unwrap(),
+                    y: p.next().unwrap().parse().unwrap(),
+                }
             },
         })
     }
@@ -87,24 +91,34 @@ fn main() {
             break;
         }
 
-        let action : Action = line.parse().unwrap();
-        //println!("{:?}", action);
-        for i in action.start.x..action.end.x+1 {
-            for j in action.start.y..action.end.y+1 {
+        let action: Action = line.parse().unwrap();
+        // println!("{:?}", action);
+        for i in action.start.x..action.end.x + 1 {
+            for j in action.start.y..action.end.y + 1 {
                 match action.cmd {
-                    Command::Toggle => { lights[i][j] ^= lights[i][j]; },
-                    Command::On     => { lights[i][j] = true; },
-                    Command::Off    => { lights[i][j] = false; },
+                    Command::Toggle => {
+                        lights[i][j] ^= lights[i][j];
+                    }
+                    Command::On => {
+                        lights[i][j] = true;
+                    }
+                    Command::Off => {
+                        lights[i][j] = false;
+                    }
                 }
             }
         }
 
-        for i in action.start.x..action.end.x+1 {
-            for j in action.start.y..action.end.y+1 {
+        for i in action.start.x..action.end.x + 1 {
+            for j in action.start.y..action.end.y + 1 {
                 match action.cmd {
-                    Command::Toggle => { brights[i][j] += 2; },
-                    Command::On     => { brights[i][j] += 1; },
-                    Command::Off    => {
+                    Command::Toggle => {
+                        brights[i][j] += 2;
+                    }
+                    Command::On => {
+                        brights[i][j] += 1;
+                    }
+                    Command::Off => {
                         if brights[i][j] > 0 {
                             brights[i][j] -= 1;
                         }

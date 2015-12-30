@@ -14,30 +14,30 @@ fn main() {
 
     let mut passed5 = false;
     for i in 1u64.. {
-       digest.reset();
-       digest.input(key);
-       digest.input(format!("{}", i).as_bytes());
-       digest.result(&mut output);
+        digest.reset();
+        digest.input(key);
+        digest.input(format!("{}", i).as_bytes());
+        digest.result(&mut output);
 
-       let mut passed = true;
-       for j in 0..2 {
-           if output[j] != 0 {
-               passed = false;
-               break;
-           }
-       }
-       if passed && !passed5 && (output[2] & 0xF0) == 0 {
-           print!("{}: ", i);
-           print_debug(&output);
-           println!("");
-           passed5 = true;
-       }
-       if passed && (output[2] & 0xFF) == 0 {
-           print!("{}: ", i);
-           print_debug(&output);
-           println!("");
-           break;
-       }
+        let mut passed = true;
+        for j in 0..2 {
+            if output[j] != 0 {
+                passed = false;
+                break;
+            }
+        }
+        if passed && !passed5 && (output[2] & 0xF0) == 0 {
+            print!("{}: ", i);
+            print_debug(&output);
+            println!("");
+            passed5 = true;
+        }
+        if passed && (output[2] & 0xFF) == 0 {
+            print!("{}: ", i);
+            print_debug(&output);
+            println!("");
+            break;
+        }
     }
 }
 
