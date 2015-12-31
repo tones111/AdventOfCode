@@ -1,5 +1,6 @@
 extern crate crypto;
 
+use std::fmt::Write;
 use std::io::{self, Read};
 use crypto::md5::Md5;
 use crypto::digest::Digest;
@@ -12,37 +13,51 @@ fn main() {
     let mut digest = Md5::new();
     let mut output = [0u8; 16];
 
-    let mut passed5 = false;
+    let leading0_1 = 5;
+    let mut found_1 = false;
+    let leading0_2 = 6;
+    let mut found_2 = false;
+
     for i in 1u64.. {
         digest.reset();
         digest.input(key);
         digest.input(format!("{}", i).as_bytes());
-        digest.result(&mut output);
+        digest.result(&mut output[..]);
 
-        let mut passed = true;
-        for j in 0..2 {
-            if output[j] != 0 {
-                passed = false;
-                break;
-            }
+        if test_hash(&output, leading0_1) && !found_1 {
+            found_1 = true;
+            println!("{}: {} {}", leading0_1, i, hash2string(&output));
         }
-        if passed && !passed5 && (output[2] & 0xF0) == 0 {
-            print!("{}: ", i);
-            print_debug(&output);
-            println!("");
-            passed5 = true;
+        if test_hash(&output, leading0_2) && !found_2 {
+            found_2 = true;
+            println!("{}: {} {}", leading0_2, i, hash2string(&output));
         }
-        if passed && (output[2] & 0xFF) == 0 {
-            print!("{}: ", i);
-            print_debug(&output);
-            println!("");
+
+        if found_1 && found_2 {
             break;
         }
     }
 }
 
-fn print_debug(s: &[u8]) {
-    for b in s.iter() {
-        print!("{:02x}", b);
+fn test_hash(hash: &[u8], num_zeroes: u8) -> bool {
+    let bytes = num_zeroes / 2;
+
+    if num_zeroes == 0 {
+        return true;
+    } else if num_zeroes >= 2 {
+        for i in 0..bytes {
+            if hash[i as usize] != 0 {
+                return false;
+            }
+        }
     }
+    num_zeroes % 2 == 0 || hash[bytes as usize] & 0xF0 == 0
+}
+
+fn hash2string(hash: &[u8]) -> String {
+    let mut s = String::new();
+    for b in hash.iter() {
+        write!(&mut s, "{:02x}", b).unwrap();
+    }
+    s
 }
