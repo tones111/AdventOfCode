@@ -24,11 +24,11 @@ fn main() {
         digest.input(format!("{}", i).as_bytes());
         digest.result(&mut output[..]);
 
-        if test_hash(&output, leading0_1) && !found_1 {
+        if !found_1 && test_hash(&output, leading0_1) {
             found_1 = true;
             println!("{}: {} {}", leading0_1, i, hash2string(&output));
         }
-        if test_hash(&output, leading0_2) && !found_2 {
+        if !found_2 && test_hash(&output, leading0_2) {
             found_2 = true;
             println!("{}: {} {}", leading0_2, i, hash2string(&output));
         }

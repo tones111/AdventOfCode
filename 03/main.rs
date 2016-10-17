@@ -1,10 +1,29 @@
 use std::io::{self, Read};
 use std::collections::HashSet;
 
+#[derive(Copy, Clone)]
+enum Direction {
+    North,
+    East,
+    South,
+    West,
+}
+
 #[derive(PartialEq, Eq, Hash, Copy, Clone)]
 struct Coord {
     x: i32,
     y: i32,
+}
+
+impl Coord {
+    fn mv(&mut self, d: Direction) {
+        match d {
+            Direction::North => self.y += 1,
+            Direction::East => self.x += 1,
+            Direction::South => self.y -= 1,
+            Direction::West => self.x -= 1,
+        }
+    }
 }
 
 fn main() {
@@ -19,41 +38,32 @@ fn main() {
     let mut visited2 = HashSet::new();
     visited2.insert(pos1);
 
-    for (i, dir) in io::stdin().bytes().enumerate() {
-        let dir = dir.unwrap() as char;
+    for (i, dir) in io::stdin()
+        .bytes()
+        .filter_map(|d| {
+            match d.unwrap() as char {
+                '^' => Some(Direction::North),
+                '>' => Some(Direction::East),
+                'v' => Some(Direction::South),
+                '<' => Some(Direction::West),
+                _ => None,
+            }
+        })
+        .enumerate() {
+
         // puzzle 1
-        pos = move_pos(pos, dir);
+        pos.mv(dir);
         visited.insert(pos);
 
         // puzzle 2
         if i % 2 == 0 {
-            pos1 = move_pos(pos1, dir);
+            pos1.mv(dir);
             visited2.insert(pos1);
         } else {
-            pos2 = move_pos(pos2, dir);
+            pos2.mv(dir);
             visited2.insert(pos2);
         }
     }
     println!("visited: {}", visited.len());
     println!("visited2: {}", visited2.len());
-}
-
-fn move_pos(c: Coord, dir: char) -> Coord {
-    let mut pos = c;
-    match dir {
-        '^' => {
-            pos.y += 1;
-        }
-        '>' => {
-            pos.x += 1;
-        }
-        'v' => {
-            pos.y -= 1;
-        }
-        '<' => {
-            pos.x -= 1;
-        }
-        _ => {}
-    }
-    pos
 }

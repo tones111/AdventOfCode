@@ -1,11 +1,11 @@
-use std::io;
+use std::io::{self, BufRead};
 use std::str::FromStr;
 
 #[derive(Debug)]
 enum Command {
-    Toggle,
     Off,
     On,
+    Toggle,
 }
 
 impl FromStr for Command {
@@ -27,6 +27,17 @@ struct Point {
     y: usize,
 }
 
+impl FromStr for Point {
+    type Err = std::num::ParseIntError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let coords: Vec<&str> = s.split(',').collect();
+        Ok(Point {
+            x: try!(coords[0].parse()),
+            y: try!(coords[1].parse()),
+        })
+    }
+}
+
 #[derive(Debug)]
 struct Action {
     start: Point,
@@ -37,92 +48,53 @@ struct Action {
 impl FromStr for Action {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut action_index = 0;
-        let mut start_index = 0;
-        let mut end_index = 0;
+        let mut start = Point { x: 0, y: 0 };
+        let mut end = Point { x: 0, y: 0 };
 
-        let s = s.trim().split(' ').collect::<Vec<_>>();
-        match s[0] {
-            "toggle" => {
-                action_index = 0;
-                start_index = 1;
-                end_index = 3;
-            }
-            "turn" => {
-                action_index = 1;
-                start_index = 2;
-                end_index = 4;
-            }
-            _ => {
-                return Err(());
-            }
-        };
-        Ok(Action {
-            cmd: s[action_index].parse().unwrap(),
-            start: {
-                let mut p = s[start_index].split(',');
-                Point {
-                    x: p.next().unwrap().parse().unwrap(),
-                    y: p.next().unwrap().parse().unwrap(),
+        for (i, tok) in s.split(' ').rev().enumerate() {
+            // println!("{}: {}", i, tok);
+            match i {
+                0 => end = tok.parse().unwrap(),
+                2 => start = tok.parse().unwrap(),
+                3 => {
+                    return Ok(Action {
+                        cmd: tok.parse().unwrap(),
+                        start: start,
+                        end: end,
+                    })
                 }
-            },
-            end: {
-                let mut p = s[end_index].split(',');
-                Point {
-                    x: p.next().unwrap().parse().unwrap(),
-                    y: p.next().unwrap().parse().unwrap(),
-                }
-            },
-        })
+                _ => {}
+            }
+        }
+        Err(())
     }
 }
 
 fn main() {
-    let mut lights = [[false; 1000]; 1000];
-    let mut brights = [[0u8; 1000]; 1000];
+    let mut lights = [[false; 1000]; 1000]; // puzzle 1
+    let mut brights = [[0u8; 1000]; 1000];  // puzzle 2
 
-    let mut line = String::new();
-    loop {
-        line.clear();
-        io::stdin().read_line(&mut line).unwrap();
-        let line = line.trim_right();
-
-        if line.len() == 0 {
-            break;
-        }
+    let stdin = io::stdin();
+    for line in stdin.lock().lines().map(|l| l.unwrap()) {
 
         let action: Action = line.parse().unwrap();
         // println!("{:?}", action);
-        for i in action.start.x..action.end.x + 1 {
-            for j in action.start.y..action.end.y + 1 {
-                match action.cmd {
-                    Command::Toggle => {
-                        lights[i][j] ^= lights[i][j];
-                    }
-                    Command::On => {
-                        lights[i][j] = true;
-                    }
-                    Command::Off => {
-                        lights[i][j] = false;
-                    }
-                }
-            }
-        }
 
         for i in action.start.x..action.end.x + 1 {
             for j in action.start.y..action.end.y + 1 {
+                // Puzzle 1
+                lights[i][j] = match action.cmd {
+                    Command::On => true,
+                    Command::Off => false,
+                    Command::Toggle => !lights[i][j],
+                };
+
+                // Puzzle 2
                 match action.cmd {
-                    Command::Toggle => {
-                        brights[i][j] += 2;
-                    }
-                    Command::On => {
-                        brights[i][j] += 1;
-                    }
-                    Command::Off => {
-                        if brights[i][j] > 0 {
-                            brights[i][j] -= 1;
-                        }
-                    }
+                    Command::On => brights[i][j] += 1,
+                    Command::Off if brights[i][j] > 0 => brights[i][j] -= 1,
+                    Command::Off => {}
+                    Command::Toggle => brights[i][j] += 2,
                 }
             }
         }

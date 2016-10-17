@@ -10,8 +10,8 @@ use std::thread;
 
 fn main() {
     const THREADS: u8 = 3;
-    const HASH_BEGIN: &'static str = "00000";
-    const CHUNK_SIZE: u16 = 1;
+    const HASH_BEGIN: &'static str = "000000";
+    const CHUNK_SIZE: u16 = 256;
 
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();

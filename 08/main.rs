@@ -1,4 +1,4 @@
-use std::io;
+use std::io::{self, BufRead};
 
 fn main() {
     let mut code_len = 0usize;
@@ -6,17 +6,9 @@ fn main() {
     let mut recode_len = 0usize;
     let mut recode = String::new();
 
-    let mut line = String::new();
-    loop {
-        line.clear();
-        io::stdin().read_line(&mut line).unwrap();
-        let line = line.trim_right();
+    let stdin = io::stdin();
+    for line in stdin.lock().lines().map(|l| l.unwrap()) {
 
-        if line.len() == 0 {
-            break;
-        }
-
-        let mut mem = 0u8;
         let mut escape = false;
         let mut escape_lit = 0u8;
 
@@ -28,7 +20,7 @@ fn main() {
                     escape_lit -= 1;
                     if escape_lit == 0 {
                         escape = false;
-                        mem += 1;
+                        mem_len += 1;
                     }
                     recode.push(c);
                     continue;
@@ -36,7 +28,7 @@ fn main() {
 
                 match c {
                     '\\' | '"' => {
-                        mem += 1;
+                        mem_len += 1;
                         recode.push('\\');
                         recode.push(c);
                         escape = false;
@@ -56,13 +48,12 @@ fn main() {
                 recode.push_str(r#"\""#);
             } else {
                 recode.push(c);
-                mem += 1;
+                mem_len += 1;
             }
         }
         recode.push('"');
 
         code_len += line.len();
-        mem_len += mem as usize;
         recode_len += recode.len();
     }
     println!("{} - {} = {}", code_len, mem_len, code_len - mem_len);

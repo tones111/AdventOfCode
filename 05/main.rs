@@ -1,18 +1,11 @@
-use std::io;
+use std::io::{self, BufRead};
 
 fn main() {
     let mut num_nice1 = 0;
     let mut num_nice2 = 0;
-    let mut line = String::new();
-    loop {
-        line.clear();
-        io::stdin().read_line(&mut line).unwrap();
-        let line = line.trim_right();
 
-        if line.len() == 0 {
-            break;
-        }
-
+    let stdin = io::stdin();
+    for line in stdin.lock().lines().map(|l| l.unwrap()) {
         if nice1(&line) {
             num_nice1 += 1;
         }
@@ -25,12 +18,10 @@ fn main() {
 }
 
 fn nice1(word: &str) -> bool {
-    let mut found_bad = false;
     for bad in ["ab", "cd", "pq", "xy"].iter() {
-        found_bad = found_bad || word.contains(bad);
-    }
-    if found_bad {
-        return false;
+        if word.contains(bad) {
+            return false;
+        }
     }
 
     let mut vowels = 0;
