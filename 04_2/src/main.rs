@@ -43,11 +43,8 @@ fn main() {
                     digest.input(key.as_bytes());
                     digest.input(format!("{}", index).as_bytes());
 
-                    match tx.send((index, digest.result_str())) {
-                        Err(_) => {
-                            break 'send;
-                        }
-                        _ => {}
+                    if tx.send((index, digest.result_str())).is_err() {
+                        break 'send;
                     }
                 }
             }
@@ -74,7 +71,7 @@ fn main() {
                 }
             }
         }
-        let ref mut msg = next_msg[next_chan];
+        let msg = &mut next_msg[next_chan];
 
         if msg.0 != processed + 1 {
             println!("Error: couldn't find next value {} != {}",

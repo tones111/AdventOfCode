@@ -16,7 +16,7 @@ fn main() {
             let tokens: Vec<_> = line.split_whitespace().collect();
 
             let mut indices = Vec::new();
-            for city in [tokens[0], tokens[2]].iter() {
+            for city in &[tokens[0], tokens[2]] {
                 indices.push(*columns.entry(city.to_string()).or_insert_with(|| {
                     let i = index;
                     index += 1;

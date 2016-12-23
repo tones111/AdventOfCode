@@ -16,7 +16,7 @@ fn main() {
             let tokens: Vec<_> = line.split_whitespace().collect();
 
             let mut indices = Vec::new();
-            for person in [tokens[0], tokens[10].trim_right_matches('.')].iter() {
+            for person in &[tokens[0], tokens[10].trim_right_matches('.')] {
                 indices.push(*columns.entry(person.to_string()).or_insert_with(|| {
                     let i = index;
                     index += 1;
@@ -25,10 +25,10 @@ fn main() {
             }
             scores.push((indices,
                          match tokens[2] {
-                "gain" => 1,
-                "lose" => -1,
-                _ => panic!("unexpected happines modifier"),
-            } * tokens[3].parse::<u32>().unwrap() as i32));
+                             "gain" => 1,
+                             "lose" => -1,
+                             _ => panic!("unexpected happines modifier"),
+                         } * tokens[3].parse::<u32>().unwrap() as i32));
 
         }
         let scores = scores;
@@ -43,10 +43,12 @@ fn main() {
     let score_without = most_happy(&table);
     println!("Optimal Happness: {}", score_without);
 
-    // Add myself to the table
-    for i in 0..table.len() {
-        table[i].push(Some(0));
+    // Add myself as a new column in the table
+    for row in &mut table {
+        row.push(Some(0));
     }
+
+    // Add now for my row
     let mut me = Vec::new();
     for i in 0..table[0].len() {
         if i == table[0].len() - 1 {
@@ -61,23 +63,29 @@ fn main() {
     println!("with me: {}", score_with);
 }
 
-fn most_happy(table: &Vec<Vec<Option<i32>>>) -> i32 {
+fn most_happy(table: &[Vec<Option<i32>>]) -> i32 {
     let num_people = table.len();
     let mut high_score = None;
 
     let mut per_ids: Vec<_> = (0..num_people).collect();
     for order in Heap::new(&mut per_ids) {
-        let mut score = table[order[0]][order[num_people - 1]].unwrap() +
-                        table[order[num_people - 1]][order[0]].unwrap();
-        for i in 0..num_people {
+        let mut score = 0;
+        for (i, cur) in order.iter().enumerate() {
             if i == 0 {
-                score += table[order[i]][order[i + 1]].unwrap();
+                let prev = order[num_people - 1];
+                let next = order[i + 1];
+                score += table[*cur][prev].unwrap();
+                score += table[*cur][next].unwrap();
             } else if i == num_people - 1 {
-                score += table[order[i]][order[i - 1]].unwrap();
-
+                let prev = order[i - 1];
+                let next = order[0];
+                score += table[*cur][prev].unwrap();
+                score += table[*cur][next].unwrap();
             } else {
-                score += table[order[i]][order[i - 1]].unwrap();
-                score += table[order[i]][order[i + 1]].unwrap();
+                let prev = order[i - 1];
+                let next = order[i + 1];
+                score += table[*cur][prev].unwrap();
+                score += table[*cur][next].unwrap();
             }
         }
 

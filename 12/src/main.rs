@@ -42,20 +42,21 @@ fn sum_nored(v: &Value) -> i64 {
         Value::U64(u) => u as i64,
         Value::Array(ref a) => a.iter().map(|v| sum_nored(v)).sum(),
         Value::Object(ref m) => {
-            if m.values()
+            let has_red = m.values()
                 .filter(|v| {
                     match **v {
                         Value::String(ref s) if s == "red" => true,
                         _ => false,
                     }
                 })
-                .count() > 0 {
+                .count() > 0;
+
+            if has_red {
                 0
             } else {
                 m.values().map(|v| sum_nored(v)).sum()
             }
         }
-
         Value::Null => {
             println!("Null");
             0
